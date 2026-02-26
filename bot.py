@@ -83,9 +83,23 @@ def save_message(msg_id, source, date, text, score, matched, permalink, draft):
     conn = get_db()
     conn.execute("""
         INSERT OR IGNORE INTO messages
-        (message_id, source, date, text, score, matched_keywords, permalink, draft)
-        VALUES (?,?,?,?,?,?,?,?)
-    """, (msg_id, source, date, text, score, ','.join(matched), permalink, draft))
+        (message_id, source, source_type, date, text, score, matched_keywords, permalink, source_message_link, draft, draft_proposal, draft_dm, status)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+    """, (
+        msg_id,
+        source,
+        'telegram',
+        date,
+        text,
+        score,
+        ','.join(matched),
+        permalink,
+        permalink,
+        draft,
+        draft,
+        draft,
+        'new',
+    ))
     conn.commit()
     conn.close()
 

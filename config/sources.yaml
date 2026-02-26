@@ -1,0 +1,22 @@
+channels:
+- remocate
+- python_jobs
+- django_jobs
+- backend_jobs
+- tactlang
+- tondev_eng
+- remocatedevs
+- tools_community
+- tonhunt
+- tondev_news
+- thehire
+- PythonJobs4u
+poll_interval: 300
+rss_feeds:
+- name: Remotive Dev Jobs
+  url: https://remotive.com/remote-jobs/rss/software-dev
+- name: WeWorkRemotely
+  url: https://weworkremotely.com/remote-jobs.rss
+- name: Himalayas
+  url: https://himalayas.app/jobs/rss
+rss_interval: 1800

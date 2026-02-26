@@ -5,14 +5,15 @@ Config-driven — edit config/profile.yaml to change behavior.
 
 import re
 import yaml
-import os
+from pathlib import Path
 from typing import Tuple
 
-CONFIG_PATH = os.path.join(os.path.dirname(__file__), '..', 'config', 'profile.yaml')
+BASE_DIR = Path(__file__).resolve().parent
+CONFIG_PATH = BASE_DIR / "config" / "profile.yaml"
 
 
 def load_config() -> dict:
-    with open(CONFIG_PATH, 'r') as f:
+    with open(CONFIG_PATH, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
 

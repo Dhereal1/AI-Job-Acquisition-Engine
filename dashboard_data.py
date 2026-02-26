@@ -51,8 +51,12 @@ def ensure_schema(conn: sqlite3.Connection) -> None:
             score            INTEGER DEFAULT 0,
             matched_keywords TEXT,
             permalink        TEXT,
+            source_message_link TEXT,
             notified         INTEGER DEFAULT 0,
             draft            TEXT,
+            draft_proposal   TEXT,
+            draft_dm         TEXT,
+            status           TEXT DEFAULT 'new',
             created_at       TEXT DEFAULT (datetime('now'))
         );
         CREATE INDEX IF NOT EXISTS idx_score ON messages(score);
@@ -60,6 +64,19 @@ def ensure_schema(conn: sqlite3.Connection) -> None:
         CREATE INDEX IF NOT EXISTS idx_date ON messages(date);
         """
     )
+    existing = {
+        row["name"] if isinstance(row, sqlite3.Row) else row[1]
+        for row in conn.execute("PRAGMA table_info(messages)").fetchall()
+    }
+    additions = {
+        "status": "TEXT DEFAULT 'new'",
+        "draft_proposal": "TEXT",
+        "draft_dm": "TEXT",
+        "source_message_link": "TEXT",
+    }
+    for col, sql_type in additions.items():
+        if col not in existing:
+            conn.execute(f"ALTER TABLE messages ADD COLUMN {col} {sql_type}")
 
 
 def fetch_stats(min_score: int = 0, source_type: str = "all") -> dict[str, Any]:
