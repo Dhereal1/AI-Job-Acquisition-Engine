@@ -14,6 +14,7 @@ AI Job Acquisition Engine monitors Telegram channels and RSS feeds, scores oppor
 - Proposal draft generator (template-based)
 - Manual-approval workflow (no auto-spam)
 - CLI dashboard + FastAPI review dashboard
+- Owner-only Telegram UI bot (`ui_bot.py`) with approve/skip/applied actions
 
 ## Architecture
 
@@ -46,7 +47,11 @@ pip install -r requirements.txt
 
 ### 2. Configure Telegram credentials
 
-Create your credentials file and add `api_id` and `api_hash` from `https://my.telegram.org/apps`.
+Create your credentials file and add:
+- `api_id`
+- `api_hash`
+- `bot_token` (from `@BotFather`)
+- `owner_user_id` (your Telegram user id; UI bot is owner-locked)
 
 ### 3. Validate Telegram session manually
 
@@ -75,6 +80,18 @@ python3 init_db.py
 python3 bot.py
 python3 rss_poller.py
 ```
+
+Run the owner UI bot in a second terminal:
+
+```bash
+python3 ui_bot.py
+```
+
+Commands:
+- `/start`
+- `/inbox`
+- `/strong`
+- `/stats`
 
 ### 6. Review matched jobs
 
