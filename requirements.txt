@@ -1,0 +1,5 @@
+telethon
+PyYAML
+feedparser
+fastapi
+uvicorn

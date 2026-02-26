@@ -1,0 +1,68 @@
+roles:
+  - ai backend engineer
+  - telegram bot developer
+  - automation engineer
+  - web3 backend engineer
+  - python developer
+  - backend developer
+
+keywords:
+  must_have:
+    - fastapi
+    - telegram
+    - bot
+    - python
+    - backend
+    - api
+
+  nice_to_have:
+    - ton
+    - web3
+    - blockchain
+    - wallet
+    - rag
+    - llm
+    - agent
+    - n8n
+    - automation
+    - workflow
+    - webhooks
+    - docker
+    - postgres
+    - redis
+    - cicd
+    - github actions
+    - aiogram
+    - pyrogram
+    - celery
+    - asyncio
+
+negative_keywords:
+  - senior
+  - lead
+  - staff
+  - principal
+  - "7+ years"
+  - "10+ years"
+  - "8+ years"
+  - phd
+  - solidity
+
+weights:
+  must_have: 6
+  nice_to_have: 3
+  role_match: 4
+  negative: -8
+
+thresholds:
+  notify: 14     # minimum score to send notification
+  strong: 22     # strong match — highlight differently
+
+your_info:
+  name: "Your Name"
+  skills: "Python, FastAPI, Telegram bots (aiogram/pyrogram), TON/Web3 integrations, RAG/LLM pipelines, n8n automation, Docker, PostgreSQL, Redis"
+  experience: "2+ years building backend systems and Telegram bots"
+  portfolio: "github.com/yourusername"
+  timezone: "UTC+3"
+  availability: "immediately"
+  rate_note: "open to discuss based on scope"
