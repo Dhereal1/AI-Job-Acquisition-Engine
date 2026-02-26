@@ -1,141 +1,146 @@
-# jobbot 🤖
+# AI Job Acquisition Engine
 
-Local Telegram job-hunting bot. Monitors channels + RSS feeds, scores posts against your skill profile, and delivers matched jobs with ready-to-send draft proposals to your Saved Messages.
+A config-driven Telegram job intelligence system for AI/backend engineers.
 
-**No auto-DMs. No auto-apply. You always send manually.**
+AI Job Acquisition Engine monitors Telegram channels and RSS feeds, scores opportunities against your profile, and generates response drafts you can manually review before sending.
 
----
+## Features
 
-## Quick Start
+- Telegram job listener (`Telethon`)
+- RSS ingestion pipeline
+- Editable YAML skill matcher
+- Relevance scoring engine with configurable weights
+- SQLite tracking and status management
+- Proposal draft generator (template-based)
+- Manual-approval workflow (no auto-spam)
+- CLI dashboard + FastAPI review dashboard
 
-### 1. Get Telegram API credentials (free, 2 min)
-1. Go to https://my.telegram.org/apps
-2. Create an app (name doesn't matter)
-3. Copy `api_id` and `api_hash`
+## Architecture
 
-### 2. Create your credentials file
-```bash
-cp config/credentials.yaml.example config/credentials.yaml
-# Edit with your api_id and api_hash
+```text
+Telegram Channels + RSS Feeds
+            |
+            v
+   Listener Layer (Telethon / RSS Poller)
+            |
+            v
+ Matcher (YAML-configurable scoring rules)
+            |
+            v
+      SQLite Storage (jobs.db)
+            |
+            v
+ Notification + Draft Generator
+            |
+            v
+   Review Interfaces (CLI / FastAPI)
 ```
 
-### 3. Edit your profile
-```bash
-nano config/profile.yaml
-# Update your_info section with your name, portfolio, timezone
-```
+## Setup
 
-### 4. Install and initialize
+### 1. Install dependencies
+
 ```bash
 pip install -r requirements.txt
-python scripts/init_db.py
 ```
 
-### 5. Discover channels to monitor
+### 2. Configure Telegram credentials
+
+Create your credentials file and add `api_id` and `api_hash` from `https://my.telegram.org/apps`.
+
+### 3. Validate Telegram session manually
+
+```python
+from telethon.sync import TelegramClient
+
+api_id = 123456
+api_hash = "your_api_hash"
+
+client = TelegramClient("session", api_id, api_hash)
+client.start()
+print(client.get_me())
+```
+
+If this succeeds, auth/session setup is correct.
+
+### 4. Initialize local database
+
 ```bash
-python scripts/discover.py
-# Lists all your Telegram chats → select which ones to monitor
+python3 init_db.py
 ```
 
-### 6. Run the bot
+### 5. Run collectors
+
 ```bash
-python bot.py
-```
-First run will ask for your phone number and a 2FA code. After that, it's automatic.
-
----
-
-## How It Works
-
-```
-Telegram channels → Listener → Scorer → Filter → Draft → Notify (Saved Messages)
-RSS feeds ────────────────────────────────────────────────────────────────────────┘
+python3 bot.py
+python3 rss_poller.py
 ```
 
-1. **Listener** watches configured channels for new messages
-2. **Scorer** runs keyword matching (must_have × 6pts, nice_to_have × 3pts, negative × -8pts)
-3. **Filter** drops posts below `thresholds.notify` (default: 14)
-4. **Draft generator** picks the best template based on matched keywords
-5. **Notifier** sends a formatted message to your Saved Messages with score + excerpt + draft
+### 6. Review matched jobs
 
----
+CLI dashboard:
 
-## Configuration
-
-### `config/profile.yaml` — Your profile and scoring weights
-- Edit `keywords.must_have` and `keywords.nice_to_have` to match your stack
-- Edit `negative_keywords` to filter roles you don't want
-- Edit `your_info` with your actual details
-- Adjust `thresholds.notify` to get more or fewer alerts
-
-### `config/sources.yaml` — What to monitor
-- Add/remove channels in the `channels` list
-- Add/remove RSS feeds in `rss_feeds`
-
-### `config/templates.yaml` — Proposal drafts
-- Edit the templates in `templates.templates` to match your voice
-- The bot auto-selects the best template based on matched keywords
-- Add new template rules in `template_rules`
-
----
-
-## Scripts
-
-| Script | Description |
-|--------|-------------|
-| `python bot.py` | Run the main Telegram listener |
-| `python scripts/discover.py` | Browse your chats, add to sources.yaml |
-| `python scripts/rss_poller.py` | Run RSS polling separately |
-| `python scripts/review.py` | Browse saved matches in terminal |
-| `python scripts/review.py --min 20` | Show only strong matches (score ≥ 20) |
-| `python scripts/init_db.py` | Initialize/reset the database |
-| `python3 dashboard_cli.py --min 14 --status pending` | CLI dashboard with filters |
-| `uvicorn dashboard_web:app --reload` | Web dashboard for review in browser |
-
----
-
-## Dashboards
-
-### CLI dashboard
 ```bash
 python3 dashboard_cli.py --min 14 --status pending --limit 30
-python3 dashboard_cli.py --details --limit 5
 ```
 
-### Web dashboard (FastAPI)
+Web dashboard:
+
 ```bash
 uvicorn dashboard_web:app --reload
 ```
 
-Open `http://127.0.0.1:8000` to filter jobs, inspect details, and toggle `pending/sent`.
+Open `http://127.0.0.1:8000`.
 
----
+## Example Scoring Config
 
-## Data
+```yaml
+thresholds:
+  notify: 14
+  strong: 22
 
-All data is stored locally in `data/`:
-- `jobs.db` — SQLite database with all matched posts
-- `jobbot.session` — Telethon session (keep safe, don't share)
-- `jobbot.log` — Log file
+weights:
+  must_have: 6
+  nice_to_have: 3
+  role_match: 4
+  negative: -8
 
----
+keywords:
+  must_have:
+    - python
+    - fastapi
+    - postgresql
+  nice_to_have:
+    - docker
+    - aws
+    - llm
 
-## Finding Good Channels to Monitor
+negative_keywords:
+  - unpaid
+  - commission-only
+```
 
-Use [Telemetr.me](https://telemetr.me) to discover channels. Search for:
-- `remote backend jobs`
-- `python fastapi jobs`
-- `web3 dev jobs`
-- `telegram bot developer`
-- `TON jobs`
+## Notification Screenshot
 
-Then use `python scripts/discover.py` to add them after you've joined.
+![Job Notification Preview](assets/notification-preview.svg)
 
----
+## Roadmap
 
-## Safety Notes
+- [x] Telegram listener
+- [x] Config-driven skill matching
+- [x] Draft generation (template-based)
+- [x] Web dashboard (FastAPI)
+- [x] Multi-source support (RSS)
+- [ ] Analytics + conversion tracking
+- [ ] Team review workflow
+- [ ] Hosted SaaS foundation (Postgres + auth)
 
-- This bot **never auto-sends DMs** — you always manually send drafts
-- Uses your personal Telegram account via Telethon (user-mode, not bot-mode)
-- Don't monitor too many very-high-volume channels or Telegram may rate-limit you
-- Never commit `credentials.yaml` or `.session` files to git
+## Safety
+
+- No auto-apply and no automated unsolicited outreach
+- Human review required before sending any response
+- Keep credential/session files private (`*.session`, API keys)
+
+## Positioning
+
+Built as a practical foundation for an AI job intelligence product: local-first today, SaaS-ready architecture tomorrow.
